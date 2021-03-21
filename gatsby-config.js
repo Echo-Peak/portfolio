@@ -23,4 +23,11 @@ if (ANALYTICS_ID) {
 
 module.exports = {
   plugins,
+  siteMetadata: {
+    title: `Portfolio`,
+    siteLogo:'./test.png',
+    seo:{
+      meta:'test'
+    }
+  },
 };

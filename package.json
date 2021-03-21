@@ -1,37 +1,28 @@
 {
-  "name": "gatsby-starter-mate",
+  "name": "portfolio",
   "version": "0.0.0",
-  "description": "An accessible and fast portfolio starter for Gatsby integrated with Contentful CMS",
+  "description": "portfolio",
   "license": "MIT",
   "scripts": {
     "build": "gatsby build",
-    "start": "gatsby develop",
+    "start": "set ENABLE_GATSBY_REFRESH_ENDPOINT=true && gatsby develop",
     "serve": "gatsby serve",
     "setup": "node ./bin/setup.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/EmaSuriano/gatsby-starter-mate.git"
-  },
-  "keywords": [
-    "gatsby",
-    "starter",
-    "contentful",
-    "PWA",
-    "portfolio"
-  ],
-  "author": "Ema Suriano",
-  "bugs": {
-    "url": "https://github.com/EmaSuriano/gatsby-starter-mate/issues"
-  },
-  "homepage": "https://github.com/EmaSuriano/gatsby-starter-mate#readme",
   "dependencies": {
+    "@contentful/rich-text-html-renderer": "^14.1.2",
+    "@contentful/rich-text-react-renderer": "^14.1.2",
+    "@contentful/rich-text-types": "^14.1.2",
     "dotenv": "^8.2.0",
     "gatsby": "^2.32.11",
+    "gatsby-image": "^3.1.0",
     "gatsby-plugin-google-analytics": "^2.11.0",
     "gatsby-theme-mate": "^1.0.0",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react-dom": "^17.0.1",
+    "react-masonry-component": "^6.2.1",
+    "rsuite": "^4.9.3",
+    "styled-components": "^5.2.1"
   },
   "devDependencies": {
     "chalk": "^4.1.0",
