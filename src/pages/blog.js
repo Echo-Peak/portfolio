@@ -1,6 +1,7 @@
 import React from 'react'
 import BlogLayout from '../components/layouts/blog';
 import ContentfulRichTextParser from '../components/util/contentful-rich-text-parser';
+import { graphql } from 'gatsby';
 
 const NotFoundPage = (props) => {
   console.log(props);
