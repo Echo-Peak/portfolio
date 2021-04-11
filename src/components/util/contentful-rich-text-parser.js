@@ -32,9 +32,9 @@ const renderOptions = {
   }
 };
 
-export default function RichTextParser(contentFullNodeString=''){
+export default function RichTextParser(contentFullNodeString={}){
   if(contentFullNodeString.length){
-    return documentToReactComponents(JSON.parse(contentFullNodeString), renderOptions)
+    return documentToReactComponents(contentFullNodeString, renderOptions)
   }
   return false;
 }

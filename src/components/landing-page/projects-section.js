@@ -1,7 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Panel, PanelGroup } from 'rsuite';
+import { Panel, PanelGroup, Button } from 'rsuite';
 import ContentfulRichTextParser from '../util/contentful-rich-text-parser';
+import uuid from 'node-uuid';
+import {DataConsumer} from '../../contexts/contentful';
 
 function generateProjects(arr=[]){
   return arr.map(project => {
@@ -10,40 +12,42 @@ function generateProjects(arr=[]){
       width: '30%',
       margin: 20
     }
-    const multipleScreenshots = project.screenshots.length > 1;
+    const multipleScreenshots = project.fields.screenshots.length > 1;
     const renderMore = ()=> (
       <PanelGroup accordion bordered>
       <Panel header="More screenshots">
         <ScreenShotGroup>
-        {project.screenshots.slice(1).map(s => (
-          <ScreenshotImage src={s.file.url}/>
+        {project.fields.screenshots.slice(1).map(s => (
+          <ScreenshotImage src={s.fields.file.url} key={uuid.v4()}/>
         ))}
         </ScreenShotGroup>
       </Panel>
     </PanelGroup>
     );
     return (
-    <Panel shaded bordered bodyFill style={style}>
-      <Img src={project.screenshots[0].file.url} />
+    <Panel shaded bordered bodyFill style={style} key={uuid.v4()}>
+      <Img src={project.fields.screenshots[0].fields.file.url} />
       {multipleScreenshots && renderMore()}
-      <Panel header={project.title}>
-        <p>
-          <small>{ContentfulRichTextParser(project.description.raw)}</small>
-        </p>
+      <Panel header={project.fields.title}>
+        {ContentfulRichTextParser(project.fields.description)}
+        
       </Panel>
+      <Button style={{marginTop:20}} appearance="primary" href="#">View on Kindle</Button>
     </Panel>
     )
   })
 }
-export default function ProjectsSection(props){
-  let projects = props.data;
+class ProjectsSection extends React.Component{
 
-  let currentContent = <NoContent>No projects to show</NoContent>;
-  if(projects.length){
-    currentContent = generateProjects(projects);
-  }
-  return (
-    <Container>
+  render(){
+    let projects = this.props.context.data.projects;
+//    console.log('--------', projects);
+    let currentContent = <NoContent>No projects to show</NoContent>;
+    if(projects.length){
+      currentContent = generateProjects(projects);
+    }
+    return (
+      <Container>
       <Top>
         <h2>Projects</h2>
       </Top>
@@ -51,8 +55,16 @@ export default function ProjectsSection(props){
         {currentContent}
       </Content>
     </Container>
-  );
+    );
+  }
 }
+
+let component = (props) => (
+  <DataConsumer>
+    {context => <ProjectsSection context={context} {...props}/>}
+  </DataConsumer>
+);
+export default component;
 
 const Container = styled.div`
 margin-top:60px;

@@ -3,20 +3,14 @@ require('dotenv').config();
 const { ACCESS_TOKEN, SPACE_ID, ANALYTICS_ID } = process.env;
 
 const plugins = [
+  'gatsby-plugin-sass',
   // {
-  //   resolve: `gatsby-theme-mate`,
+  //   resolve: `gatsby-source-contentful`,
   //   options: {
-  //     accessToken: ACCESS_TOKEN,
   //     spaceId: SPACE_ID,
+  //     accessToken: process.env.ACCESS_TOKEN,
   //   },
-  // },
-  {
-    resolve: `gatsby-source-contentful`,
-    options: {
-      spaceId: SPACE_ID,
-      accessToken: process.env.ACCESS_TOKEN,
-    },
-  }
+  // }
 ];
 
 if (ANALYTICS_ID) {

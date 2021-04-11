@@ -33,6 +33,12 @@ flex-direction:row;
 height:60px;
 border-bottom:1px solid #f7f7fa;
 padding-bottom:4px;
+position:fixed;
+width:100%;
+background:#f7f7fa;
+top:0px;
+left:0px;
+right:0px;
 `;
 
 const SiteContainer = styled.div`

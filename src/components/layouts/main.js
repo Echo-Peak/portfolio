@@ -41,8 +41,8 @@ const MainLayout = (props)=>{
         <Content style={styles}>
           {children}
         </Content>
+        <Footer/>
       </ContentContainer>
-      <Footer/>
     </>);
   }
   return renderThis();
@@ -53,8 +53,10 @@ export default MainLayout;
 
 const ContentContainer = styled.div`
 width:100%;
-height:100%;
 background:#f9f9f9;
+margin-top:60px;
+overflow-y: scroll;
+height: calc(100% - 60px);
 `;
 
 const Content = styled.div`

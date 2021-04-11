@@ -1,62 +1,54 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Panel, PanelGroup } from 'rsuite';
+import { Panel, PanelGroup, Button } from 'rsuite';
 import ContentfulRichTextParser from '../util/contentful-rich-text-parser';
+import uuid from 'node-uuid';
+import {DataConsumer} from '../../contexts/contentful';
 
-function generateProjects(arr=[]){
-  return arr.map(project => {
+function generateWebsites(arr=[]){
+  //console.log('website',arr);
+  return arr.map(website => {
     let style = {
-      display: 'inline-block',
-      width: '30%',
-      margin: 20
+      margin: 20,
+      maxWidth:600
     }
-    const multipleScreenshots = project.screenshots.length > 1;
-    const renderMore = ()=> (
-      <PanelGroup accordion bordered>
-      <Panel header="More screenshots">
-        <ScreenShotGroup>
-        {project.screenshots.slice(1).map(s => (
-          <ScreenshotImage src={s.file.url}/>
-        ))}
-        </ScreenShotGroup>
-      </Panel>
-    </PanelGroup>
-    );
     return (
-    <Panel shaded bordered bodyFill style={style}>
-      <Img src={project.screenshots[0].file.url} />
-      {multipleScreenshots && renderMore()}
-      <Panel header={project.title}>
-        <p>
-          <small>{ContentfulRichTextParser(project.description.raw)}</small>
-        </p>
+      <Panel shaded bordered header={website.fields.title} style={style} key={uuid.v4()}>
+        <ThumbnailContainer>
+          <Img src={website.fields.thumbnail.fields.file.url}/>
+        </ThumbnailContainer>
+        <Button style={{marginTop:20}} appearance="primary" href={website.fields.link}>Checkout {website.fields.title}!</Button>
       </Panel>
-    </Panel>
     )
   })
 }
-
-function generateWebsites(){
-  
-}
-export default function WebsitesSection(props){
-  let websites = props.data;
-
-  let currentContent = <NoContent>No websites to show</NoContent>;
-  if(websites.length){
-    currentContent = generateWebsites(websites);
+class WebsitesSection extends React.Component{
+  render(){
+    let websites = this.props.context.data.websites;
+    
+    let currentContent = <NoContent>No websites to show</NoContent>;
+    if(websites.length){
+      currentContent = generateWebsites(websites);
+    }
+    return (
+      <Container>
+        <Top>
+          <h2>Websites</h2>
+        </Top>
+        <Content>
+          {currentContent}
+        </Content>
+      </Container>
+    );
   }
-  return (
-    <Container>
-      <Top>
-        <h2>Websites</h2>
-      </Top>
-      <Content>
-        {currentContent}
-      </Content>
-    </Container>
-  );
 }
+
+let component = (props) => (
+  <DataConsumer>
+    {context => <WebsitesSection context={context} {...props}/>}
+  </DataConsumer>
+);
+export default component;
 
 const Container = styled.div`
 margin-top:60px;
@@ -68,4 +60,16 @@ const Top = styled.div`
 `;
 const Content = styled.div`
 display:flex;
+`;
+
+const NoContent = styled.h4`
+margin:60px;
+
+`;
+
+const ThumbnailContainer = styled.div`
+
+`;
+const Img = styled.img`
+width:300px;
 `;
