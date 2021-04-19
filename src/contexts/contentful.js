@@ -6,6 +6,19 @@ export const Data = () => useContext(DataContext);
 export const DataConsumer = DataContext.Consumer;
 
 
+export const SCOPES = {
+  about: '5lzMxuCX84uYqmgGmU8iKU',
+  blogPosts:'wvoDi9kFeEOgN6wM'
+};
+
+export const CONTENT_IDS = {
+    blogPosts: 'blogPost',
+    projects: 'projects',
+    books: 'book',
+    websites: 'websites',
+    work: 'workPlace'
+}
+
 export default class DataProvider extends Component {
   state = {
     loading:true,
@@ -14,7 +27,8 @@ export default class DataProvider extends Component {
       blogPosts:[],
       websites:[],
       books:[],
-      work: []
+      work: [],
+      about:{}
     }
   }
   constructor(){
@@ -22,13 +36,6 @@ export default class DataProvider extends Component {
     this.scopes = {
       about: '5lzMxuCX84uYqmgGmU8iKU',
       blogPosts:'wvoDi9kFeEOgN6wM'
-    }
-    this.contentIDs = {
-      blogPosts: 'blogPost',
-      projects: 'projects',
-      books: 'book',
-      websites: 'websites',
-      work: 'workPlace'
     }
    // console.log('------------',process.env);
     this.client = contentful.createClient({
@@ -39,9 +46,10 @@ export default class DataProvider extends Component {
     this.preload();
   }
   async preload(){
-    for(let contentID in this.contentIDs){
+    for(let contentID in CONTENT_IDS){
+      if(contentID === CONTENT_IDS.blogPosts) continue;
       try{
-        let _content = await this.loadEntries(this.contentIDs[contentID], 12);
+        let _content = await this.loadEntries(CONTENT_IDS[contentID], 12);
         this.state.data[contentID] = _content;
    //     console.log(contentID, _content);
         this.setState(this.state);
@@ -49,6 +57,20 @@ export default class DataProvider extends Component {
         console.log(err);
       }
     }
+    try{
+      let aboutContent = await this.loadAbout();
+      this.state.data.about = aboutContent;
+      this.setState(this.state);
+    }catch(err){
+      console.log('Unable to load about content');
+    }
+  }
+  loadAbout(){
+    return new Promise((resolve, reject)=> {
+      this.client.getEntry(SCOPES.about).then(content => {
+        resolve(content.fields);
+      }).catch(reject);
+    })
   }
   loadEntries(contentID='', limit=1){
     return new Promise((resolve, reject)=>{
@@ -76,10 +98,18 @@ export default class DataProvider extends Component {
       console.log(`unable to fetch content for ${contentTypeID}. Error: ${err}`);
     })
   }
+  loadEntriesFor(ContentID='', queryOptions={}){
+    let query = {
+      content_type: ContentID,
+      ...queryOptions
+    };
+    return this.client.getEntries(query);
+  }
   render() {
     const configObject = {
       ...this.state,
-      fetchContent: this.fetchContent.bind(this)
+      fetchContent: this.fetchContent.bind(this),
+      loadEntriesFor: this.loadEntriesFor.bind(this)
     };
 
       return (

@@ -46,7 +46,6 @@ const MainLayout = (props)=>{
     </>);
   }
   return renderThis();
- // return (<StaticQuery query={query} render={(data => renderThis(data))}/>);
 };
 export default MainLayout;
 

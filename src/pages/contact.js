@@ -11,26 +11,3 @@ const ContactPage = (props) => {
 )}
 
 export default ContactPage;
-
-export const query = graphql`
-query ContactQuery {
-  allContentfulAbout {
-    edges {
-      node {
-        name
-        roles
-        updatedAt
-        description
-        aboutMe {
-          aboutMe
-        }
-        socialLinks {
-          name
-          fontAwesomeIcon
-          url
-        }
-      }
-    }
-  }
-}
-`

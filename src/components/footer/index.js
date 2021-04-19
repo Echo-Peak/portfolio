@@ -1,190 +1,264 @@
 import React, { useState } from "react";
 import styled from 'styled-components';
 import uuid from 'node-uuid';
-import { graphql, StaticQuery } from 'gatsby';
-import { Panel, PanelGroup, Button } from 'rsuite';
+import { Panel, PanelGroup, Button, Icon } from 'rsuite';
+import {DataConsumer, CONTENT_IDS} from '../../contexts/contentful';
 import ContentFullRichTechParser from '../util/contentful-rich-text-parser';
 
 function createBlogPostCards(posts=[]){
-  console.log('fired')
+  if(!posts.length) return false;
   return posts.map(post => {
     let style = {
-      width: 300
+      pannel:{
+        background:'white',
+
+      },
+      button:{
+        margin:10,
+        width:100
+      }
     }
-    const {content, id, createdAt, subTitle, title, thumbnail, shortDescription} = post.node;
-    console.log('---->>S>D', shortDescription)
+    const {title, subTitle, shortDescription} = post.fields;
+    const thumbnail = post.fields.thumbnail.fields.file.url;
+    //const bg = post.fields.thumbnail.fields.
+   // console.log('---->>S> D', shortDescription)
     return (
       <BlogPostCard key={uuid.v4()}>
-        <Panel shaded bordered bodyFill style={style}>
-          <BlogPostImage src={thumbnail.file.url}/>
+        <Panel shaded bodyFill style={style.pannel}>
+          <BlogPostImage src={thumbnail}/>
 
           <Panel header={title}>
             <p>
-              
+              {shortDescription}
             </p>
           </Panel>
-          <Button>View</Button>
         </Panel>
-      </BlogPostCard>
+    </BlogPostCard>
     );
   });
 }
 
 function createSocialMediaLinks(links=[]){
-
+  if(!links.length) return false;
+  return links.map((social)=>{
+    console.log('_____________ social', social);
+    return (<SocialLink key={uuid.v4()}>
+      <SocialLinkContainer>
+        <Icon icon={social.fields.fontAwesomeIcon} size='3x' style={{lineHeight: '64px'}}/>
+      </SocialLinkContainer>
+    </SocialLink>)
+  })
 }
 
 
-const Footer = (props)=>{
-//   const query = graphql`
-//   query {
-//     allContentfulAbout {
-//       edges {
-//         node {
-//           socialLinks {
-//             url
-//             name
-//           }
-//           hireable
-//           copyright
-//         }
-//       }
-//     }
-//     allContentfulBlogPost(limit: 3) {
-//       edges {
-//         node {
-//           title
-//           subTitle
-//           createdAt
-//           id
-//           content {
-//             raw
-//           }
-//           thumbnail {
-//             file {
-//               url
-//               fileName
-//               contentType
-//             }
-//           }
-//         }
-//       }
-//     }
-//   }
-// `;
-  const renderThis = (data={}) => {
-    console.log('fired');
-    // let posts = data.allContentfulPosts.edges;
-    // let aboutData = data.allContentfulAbout.edges[0].node;
+class Footer extends React.Component {
+  state = {
+    posts:[],
+    loading:true
+  }
+  constructor(props){
+    super();
+    this.DataContext = props.context;
+  }
+  componentDidMount(){
+    this.DataContext.loadEntriesFor(CONTENT_IDS.blogPosts, {limit:3}).then(entries => {
+      //console.log('----LOADED BLOG ENTRIES', entries);
+      this.setState({loading: false, posts:entries.items});
+    })
+    .catch(err => {
+      console.log(err);
+      this.setState({loading:false});
+    })
+  }
+  render(){
+    const scoialMediaLinks = this.DataContext.data.about.socialLinks;
+    const blogPosts = this.state.posts;
+
     return (
-      <Container>
-      <BlogContainer>
-        <h2>latest</h2>
-       
-      </BlogContainer>
-      <MoreButton>
-        View More
-      </MoreButton>
-      <SocialMediaContainer>
-        <SocialMedia>
-          <SocialMeadiaHeading>Social</SocialMeadiaHeading>
-        </SocialMedia>
-        <Contact>
-          <ContactButton>Contact me</ContactButton>
-          <HireButton>Hire</HireButton>
-        </Contact>
-      </SocialMediaContainer>
+    <Container>
+      <InnerContainer>
+        <BlogContainer>
+          <BlogHeading>Latest</BlogHeading>
+          {createBlogPostCards(blogPosts)}
+        <MoreButton>
+          <Button>View more</Button>
+        </MoreButton>
+        </BlogContainer>
+        <SocialMediaContainer>
+          <SocialMedia>
+            <SocialMeadiaHeading>Social</SocialMeadiaHeading>
+            <SocialMeadiaList>
+            {createSocialMediaLinks(scoialMediaLinks)}
+            </SocialMeadiaList>
+          </SocialMedia>
+          <Contact>
+            <ContactButton>Contact me</ContactButton>
+            <HireButton>Hire</HireButton>
+          </Contact>
+        </SocialMediaContainer>
+      </InnerContainer>
+      <TermsContainer>
+        <Terms><a href="/privacy">Privacy</a></Terms>
+        <Copyright>{this.DataContext.data.about.copyright}</Copyright>
+      </TermsContainer>
     </Container>
-    )
+    );
   }
-  return <StaticQuery query={
-    graphql`
-  query {
-    allContentfulAbout {
-      edges {
-        node {
-          socialLinks {
-            url
-            name
-          }
-          hireable
-          copyright
-        }
-      }
-    }
-    allContentfulBlogPost(limit: 3) {
-      edges {
-        node {
-          title
-          subTitle
-          createdAt
-          id
-          content {
-            raw
-          }
-          thumbnail {
-            file {
-              url
-              fileName
-              contentType
-            }
-          }
-        }
-      }
-    }
-  }
-`
-  } render={renderThis}/>
-};
-export default Footer;
+}
+
+
+const component = (props) => (
+  <DataConsumer>
+    {context => <Footer context={context} {...props}/>}
+  </DataConsumer>
+);
+
+
+export default component;
 
 const Container = styled.div`
 width:100%;
-height:160px;
+//height:380px;
 background:#333;
+padding-bottom:20px;
+position:relative;
 `;
 
 const InnerContainer = styled.div`
-width:60%;
+width:80%;
 height:inherit;
-margin:auto;
-background-color:red;
+margin:0 auto;
+
+display:flex;
 `;
 
 const BlogContainer = styled.div`
+flex:3;
+order:1;
+padding:12px;
 
+`;
+
+const BlogHeading = styled.h2`
+padding:12px;
+color:white;
 `;
 
 const MoreButton = styled.div`
-
+margin:20px;
 `;
 
 const SocialMediaContainer = styled.div`
-
+flex:1;
+order:2;
+padding:12px;
 `;
 
 const SocialMedia = styled.div`
 
 `;
 
-const SocialMeadiaHeading = styled.div`
-
+const SocialMeadiaHeading = styled.h3`
+color:white;
+text-align:center;
 `;
 
 const Contact = styled.div`
-
+display: flex;
+flex-direction: row;
+margin-top:60px;
+justify-content: center;
 `;
 
 const ContactButton = styled.div`
-
+width:180px;
+height:50px;
+background: red;
+border-radius: 10px;
+text-align: center;
+line-height: 50px;
+font-weight: bold;
+color: black;
+font-size: 20px;
+transition: all .3s;
+cursor: pointer;
+&:hover{
+  background:white;
+}
 `;
 
 const HireButton = styled.div`
-
+width:180px;
+height:50px;
+background: green;
+border-radius: 10px;
+text-align: center;
+line-height: 50px;
+font-weight: bold;
+color: black;
+font-size: 20px;
+margin-left:10px;
+transition: all .3s;
+cursor: pointer;
+&:hover{
+  background:white;
+}
 `;
 
 const BlogPostCard = styled.div`
-
+width:300px;
+height:300px;
+display:inline-block;
+margin-left:10px;
+margin-right:10px;
 `;
 
-const BlogPostImage = styled.img``;
+const BlogPostImage = styled.img`
+background-size:cover;
+width:300px;
+height:300px;
+`;
+
+const TermsContainer = styled.div`
+display:flex;
+flex-direction: row;
+position:absolute;
+bottom:0px;
+right:0px;
+margin:10px;
+
+`;
+const Terms = styled.div`
+width:200px;
+a {
+  color: #999;
+}
+`;
+
+const Copyright = styled.div`
+width:200px;
+`;
+
+const SocialLink = styled.div`
+
+`;
+const SocialMeadiaList = styled.div`
+display:flex;
+flex-direction: row;
+justify-content: center;
+`;
+const SocialLinkContainer = styled.div`
+width:64px;
+height:64px;
+background:#777;
+border-radius:10px;
+margin:10px;
+text-align: center;
+i{
+  transition: all .2s;
+  cursor: pointer;
+  &:hover {
+    color:white;
+  }
+}
+`;

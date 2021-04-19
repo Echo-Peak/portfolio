@@ -11,26 +11,3 @@ const HirePage = (props) => {
 )}
 
 export default HirePage;
-
-export const query = graphql`
-query ContactQueryAndHire {
-  allContentfulAbout {
-    edges {
-      node {
-        name
-        roles
-        updatedAt
-        description
-        aboutMe {
-          aboutMe
-        }
-        socialLinks {
-          name
-          fontAwesomeIcon
-          url
-        }
-      }
-    }
-  }
-}
-`
